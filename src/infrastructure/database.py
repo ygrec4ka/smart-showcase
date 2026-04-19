@@ -1,5 +1,7 @@
 from typing import AsyncGenerator
 
+from core.config import settings
+
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncEngine,
@@ -36,10 +38,7 @@ class DatabaseHelper:
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
         """Dependency for FastAPI"""
         async with self.session_factory() as session:
-            try:
-                yield session
-            finally:
-                await session.close()
+            yield session
 
 
 database_helper = DatabaseHelper(
