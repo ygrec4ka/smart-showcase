@@ -1,35 +1,10 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from modules.catalog.domain.entities import Product, Category
-from modules.catalog.infrastructure.models import ProductTable, CategoryTable
-
-
-class CategoryRepository:
-    def __init__(self, session: AsyncSession):
-        self._session = session
-
-    async def get_by_id(self, category_id: UUID, company_id: UUID) -> Category | None:
-        """Получает категорию из базы и превращает его в доменную сущность"""
-        result = await self._session.execute(
-            select(CategoryTable).where(
-                CategoryTable.id == category_id,
-                CategoryTable.company_id == company_id,
-            )
-        )
-        category_orm: CategoryTable | None = result.scalar_one_or_none()
-
-        if not category_orm:
-            return None
-
-        return Category(
-            name=category_orm.name,
-            company_id=category_orm.company_id,
-            parent_id=category_orm.parent_id,
-            id=category_orm.id,
-        )
+from modules.catalog.domain.entities import Product
+from modules.catalog.infrastructure.models import ProductTable
 
 
 class ProductRepository:
@@ -44,7 +19,6 @@ class ProductRepository:
             )
         )
         product_orm: ProductTable | None = result.scalar_one_or_none()
-
         if not product_orm:
             return None  # В будущем можно реализовать custom исключения.
 
@@ -68,7 +42,6 @@ class ProductRepository:
         )
 
         product_orm: ProductTable | None = result.scalar_one_or_none()
-
         if not product_orm:
             return None
 
@@ -82,6 +55,16 @@ class ProductRepository:
             description=product_orm.description,
             is_active=product_orm.is_active,
         )
+
+    async def list(
+        self,
+    ):
+        pass
+
+    async def product_update(
+        self,
+    ) -> Product:
+        pass
 
     async def save(
         self, product: Product
