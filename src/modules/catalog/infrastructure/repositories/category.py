@@ -12,7 +12,6 @@ class CategoryRepository:
         self._session = session
 
     async def get_by_id(self, category_id: UUID, company_id: UUID) -> Category | None:
-        """Получает категорию из базы и превращает его в доменную сущность"""
         result = await self._session.execute(
             select(CategoryTable).where(
                 CategoryTable.id == category_id,

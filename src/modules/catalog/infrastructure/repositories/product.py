@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from uuid import UUID
 
 from sqlalchemy import select, update, Result, Sequence, desc
@@ -41,6 +39,44 @@ class ProductRepository:
             created_at=product.created_at,
         )
 
+    async def create(self, product: Product) -> Product:
+        product_orm = self._to_table(product)
+
+        self._session.add(product_orm)
+        return product
+
+    async def get_by_id(self, product_id: UUID, company_id: UUID) -> Product | None:
+        stmt = select(ProductTable).where(
+            ProductTable.id == product_id,
+            ProductTable.company_id == company_id,
+        )
+        result: Result = await self._session.execute(stmt)
+        product_orm: ProductTable | None = result.scalar_one_or_none()
+
+        if not product_orm:
+            return None
+
+        return self._to_domain(product_orm)
+
+    async def get_by_ids(
+        self,
+        product_ids: list[UUID],
+        company_id: UUID,
+    ) -> Sequence[Product]:
+        if not product_ids:
+            return []
+
+        stmt = select(ProductTable).where(
+            ProductTable.id.in_(product_ids),
+            ProductTable.company_id == company_id,
+            ProductTable.is_active == True,
+        )
+
+        result: Result = await self._session.execute(stmt)
+        products_orm: Sequence[ProductTable] = result.scalars().all()
+
+        return [self._to_domain(p) for p in products_orm]
+
     async def get_by_sku(self, sku: str, company_id: UUID) -> Product | None:
         result = await self._session.execute(
             select(ProductTable).where(
@@ -59,7 +95,7 @@ class ProductRepository:
         self,
         company_id: UUID,
         limit: int = 20,
-        cursor_created_at: datetime | None = None,
+        cursor_id: UUID | None = None,
         category_id: UUID | None = None,
         only_active: bool = True,
     ) -> Sequence[Product]:
@@ -71,10 +107,10 @@ class ProductRepository:
         if category_id:
             stmt = stmt.where(ProductTable.category_id == category_id)
 
-        if cursor_created_at:
-            stmt = stmt.where(ProductTable.created_at < cursor_created_at)
+        if cursor_id:
+            stmt = stmt.where(ProductTable.id < cursor_id)
 
-        stmt = stmt.order_by(desc(ProductTable.created_at)).limit(limit + 1)
+        stmt = stmt.order_by(desc(ProductTable.id)).limit(limit + 1)
 
         result: Result = await self._session.execute(stmt)
         products_orm: Sequence[ProductTable] = result.scalars().all()
