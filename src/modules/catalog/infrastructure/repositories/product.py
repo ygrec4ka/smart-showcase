@@ -56,7 +56,7 @@ class ProductRepository:
             is_active=product_orm.is_active,
         )
 
-    async def list(
+    async def list_of_products(
         self,
     ):
         pass

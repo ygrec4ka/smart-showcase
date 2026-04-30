@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from modules.catalog.domain.entities.product import Product, ProductFilter
+from modules.catalog.domain.entities.product import Product
 from modules.catalog.domain.exceptions import (
     CategoryNotFoundError,
     SkuAlreadyExistsError,
