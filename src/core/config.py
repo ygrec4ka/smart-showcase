@@ -35,6 +35,10 @@ class DatabaseConfig(BaseModel):
     max_overflow: int = 10
 
 
+class APIPrefix(BaseModel):
+    products: str = "/products"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(
@@ -47,6 +51,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    api: APIPrefix = APIPrefix()
     db: DatabaseConfig
     logging: LoggingConfig = LoggingConfig()
 
