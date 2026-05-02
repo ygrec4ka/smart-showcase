@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Optional
-from uuid import UUID, uuid4
+from uuid import UUID
+import uuid6
+from datetime import datetime
 
 
 @dataclass
@@ -11,6 +13,7 @@ class Product:
     base_price: Decimal
     company_id: UUID
     category_id: UUID
-    id: UUID = field(default_factory=uuid4)
+    created_at: datetime
+    id: UUID = field(default_factory=uuid6.uuid7)
     description: Optional[str] = None
     is_active: bool = True
