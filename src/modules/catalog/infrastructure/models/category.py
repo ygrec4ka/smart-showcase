@@ -21,8 +21,4 @@ class CategoryTable(TenantBase, Base):
         default=uuid.uuid4,
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    parent_id: Mapped[uuid.UUID | None] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL")
-    )
-
     products: Mapped[list["ProductTable"]] = relationship(back_populates="category")
