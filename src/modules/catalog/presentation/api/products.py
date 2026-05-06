@@ -5,7 +5,10 @@ from fastapi import APIRouter, Depends, status, HTTPException, Query
 
 from core.config import settings
 from modules.catalog.application.services import ProductService
-from modules.catalog.presentation.api.dependencies import get_product_service
+from modules.catalog.presentation.api.dependencies import (
+    get_product_service,
+    get_current_company_id,
+)
 from modules.catalog.presentation.schemas.products import (
     ProductCreate,
     ProductResponse,
@@ -27,7 +30,7 @@ router = APIRouter(
 )
 async def create_product(
     data: ProductCreate,
-    company_id: UUID = Depends(...),
+    company_id: UUID = Depends(get_current_company_id),
     product_service: ProductService = Depends(get_product_service),
 ):
     return await product_service.create_product(
@@ -43,7 +46,7 @@ async def create_product(
 )
 async def get_product(
     product_id: UUID,
-    company_id: UUID = Depends(...),
+    company_id: UUID = Depends(get_current_company_id),
     product_service: ProductService = Depends(get_product_service),
 ):
     product = await product_service.get_product_by_id(
@@ -67,7 +70,7 @@ async def list_products(
     limit: int = Query(20, ge=1, le=100, description="Количество товаров на странице"),
     cursor: Optional[str] = Query(None, description="Base64 курсор для пагинации"),
     category_id: Optional[UUID] = Query(None, description="Фильтр по категории"),
-    company_id: UUID = Depends(...),
+    company_id: UUID = Depends(get_current_company_id),
     product_service: ProductService = Depends(get_product_service),
 ):
     try:
@@ -86,7 +89,7 @@ async def list_products(
 async def update_product(
     product_id: UUID,
     data: ProductUpdate,
-    company_id: UUID = Depends(...),
+    company_id: UUID = Depends(get_current_company_id),
     product_service: ProductService = Depends(get_product_service),
 ):
     product = await product_service.update_product(

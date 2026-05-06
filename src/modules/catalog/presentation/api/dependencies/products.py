@@ -16,6 +16,12 @@ def get_product_repository(
 
 def get_product_service(
     session: AsyncSession = Depends(database_helper.session_getter),
-    product_repository: ProductRepository = Depends(get_product_repository)
+    product_repository: ProductRepository = Depends(get_product_repository),
 ):
     return ProductService(session=session, product_repository=product_repository)
+
+
+def get_current_company_id(
+    session: AsyncSession = Depends(database_helper.session_getter),
+):
+    pass
