@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from infra.base import Base, TenantBase
 
-from sqlalchemy import String, ForeignKey, Numeric, func, DateTime
+from sqlalchemy import String, ForeignKey, Numeric, func, DateTime, Integer
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,10 +23,12 @@ class ProductTable(TenantBase, Base):
         primary_key=True,
         default=uuid.uuid4,
     )
+    sku: Mapped[str] = mapped_column(String(100), nullable=False)
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     description: Mapped[str | None] = mapped_column(String(2000))
-    sku: Mapped[str] = mapped_column(String(100), nullable=False)
+
     base_price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    stock_quantity: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(default=True)
 
     created_at: Mapped[datetime] = mapped_column(
@@ -41,7 +43,9 @@ class ProductTable(TenantBase, Base):
         nullable=False,
     )
 
-    category: Mapped["CategoryTable"] = relationship(back_populates="products")
+    category: Mapped["CategoryTable"] = relationship(
+        back_populates="products",
+    )
     category_id: Mapped[uuid.UUID | None] = mapped_column(
         PG_UUID(as_uuid=True),
         ForeignKey("categories.id", ondelete="SET NULL"),
