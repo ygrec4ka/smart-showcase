@@ -44,7 +44,10 @@ class UserTable(Base, TenantBase):
         nullable=False,
     )
     preferences: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, default=dict, server_default="{}", nullable=False
+        JSONB,
+        default=dict,
+        server_default="{}",
+        nullable=False,
     )
 
     created_at: Mapped[datetime] = mapped_column(
