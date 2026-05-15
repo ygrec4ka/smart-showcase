@@ -9,7 +9,7 @@ from modules.catalog.presentation.api.dependencies import (
     get_product_service,
     get_current_company_id,
 )
-from modules.catalog.presentation.schemas.products import (
+from modules.catalog.presentation.schemas.product import (
     ProductCreate,
     ProductResponse,
     ProductUpdate,
