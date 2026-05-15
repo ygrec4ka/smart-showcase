@@ -12,7 +12,7 @@ from modules.catalog.domain.entities import Product
 from modules.catalog.infrastructure.repositories import (
     ProductRepository,
 )
-from modules.catalog.presentation.schemas.products import ProductCreate, ProductUpdate
+from modules.catalog.presentation.schemas.product import ProductCreate, ProductUpdate
 
 
 class ProductService:
@@ -27,11 +27,7 @@ class ProductService:
     def _generate_sku(self) -> str:
         pass
 
-    async def create_product(
-        self,
-        company_id: UUID,
-        data: ProductCreate
-    ) -> Product:
+    async def create_product(self, company_id: UUID, data: ProductCreate) -> Product:
         new_product = Product(
             id=uuid6.uuid7(),
             title=data.title,
@@ -41,7 +37,7 @@ class ProductService:
             company_id=company_id,
             sku=self._generate_sku(),
             is_active=True,
-            created_at=datetime.now(timezone.utc)
+            created_at=datetime.now(timezone.utc),
         )
 
         await self.product_repository.create(new_product)
@@ -54,20 +50,18 @@ class ProductService:
         product_id: UUID,
         company_id: UUID,
     ) -> Product | None:
-        return await self.product_repository.get_by_id(product_id=product_id, company_id=company_id)
+        return await self.product_repository.get_by_id(
+            product_id=product_id, company_id=company_id
+        )
 
     async def get_products_by_ids(
-        self,
-        product_ids: list[UUID],
-        company_id: UUID
+        self, product_ids: list[UUID], company_id: UUID
     ) -> Sequence[Product]:
-        return await self.product_repository.get_by_ids(product_ids=product_ids, company_id=company_id)
+        return await self.product_repository.get_by_ids(
+            product_ids=product_ids, company_id=company_id
+        )
 
-    async def get_product_by_sku(
-        self,
-        sku: str,
-        company_id: UUID
-    ) -> Product | None:
+    async def get_product_by_sku(self, sku: str, company_id: UUID) -> Product | None:
         return await self.product_repository.get_by_sku(sku=sku, company_id=company_id)
 
     async def get_catalog_page(
@@ -98,7 +92,9 @@ class ProductService:
         next_cursor_b64 = None
         if has_more:
             last_item = items_to_return[-1]
-            next_cursor_b64 = base64.b64encode(str(last_item.id).encode("utf-8")).decode("utf-8")
+            next_cursor_b64 = base64.b64encode(
+                str(last_item.id).encode("utf-8")
+            ).decode("utf-8")
 
         return {
             "items": items_to_return,
@@ -133,5 +129,7 @@ class ProductService:
         product_id: UUID,
         company_id: UUID,
     ) -> None:
-        await self.product_repository.deactivate(product_id=product_id, company_id=company_id)
+        await self.product_repository.deactivate(
+            product_id=product_id, company_id=company_id
+        )
         await self._session.commit()
